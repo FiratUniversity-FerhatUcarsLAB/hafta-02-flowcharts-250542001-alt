@@ -1,0 +1,31 @@
+BAŞLA
+
+    // --- 1. Adım: Kullanıcıyı Karşılama ve PIN Doğrulama ---
+
+    YAZ "Bankamıza Hoş Geldiniz. Lütfen kartınızı yerleştiriniz."
+
+    denemeHakki = 3
+
+    DÖNGÜ (denemeHakki > 0)         YAZ "Lütfen 4 haneli şifrenizi (PIN) giriniz:"         OKU kullaniciPIN
+
+        EĞER (kullaniciPIN == dogruPIN) İSE             YAZ "Giriş başarılı. İşlem menüsüne yönlendiriliyorsunuz."             DÖNGÜDEN ÇIK // PIN doğru, döngüyü sonlandır.         DEĞİLSE             denemeHakki = denemeHakki - 1             YAZ "Hatalı şifre girdiniz. Kalan deneme hakkınız: ", denemeHakki
+
+            EĞER (denemeHakki == 0) İSE                 YAZ "3 kez hatalı giriş yaptınız. Güvenlik nedeniyle kartınız bloke edilmiştir."                 YAZ "Lütfen şubenizle iletişime geçiniz."                 PROGRAMI SONLANDIR             EĞER-SONU         DEĞİLSE-SONU     DÖNGÜ-SONU
+
+    // --- 2. Adım: Ana İşlem Döngüsü ---
+
+    islemTekrari = 'E'     DÖNGÜ (islemTekrari == 'E' VEYA islemTekrari == 'e')
+
+        // --- 2.1: Tutar Bilgisini Alma ---         YAZ "-------------------------------------------"         YAZ "Hesap Bakiyeniz: ", hesapBakiyesi, " TL"         YAZ "Kalan Günlük Limitiniz: ", gunlukLimit, " TL"         YAZ "Lütfen çekmek istediğiniz tutarı giriniz (Sadece 20 TL ve katları):"         OKU cekilecekTutar
+
+        // --- 2.2: Tutar Kontrolleri ---
+
+        // Kontrol A: Tutar 20'nin katı mı?         EĞER (cekilecekTutar % 20 != 0) İSE             YAZ "HATA: Yalnızca 20 TL ve katları tutarında işlem yapabilirsiniz."         DEĞİLSE             // Kontrol B: Bakiye yeterli mi?             EĞER (cekilecekTutar > hesapBakiyesi) İSE                 YAZ "HATA: İşlem için bakiyeniz yetersizdir."             DEĞİLSE                 // Kontrol C: Günlük limit aşılıyor mu?                 EĞER (cekilecekTutar > gunlukLimit) İSE                     YAZ "HATA: Bu işlemle günlük para çekme limitinizi aşıyorsunuz."                 DEĞİLSE                     // --- 2.3: İşlemi Gerçekleştirme (Tüm kontroller başarılıysa) ---                     hesapBakiyesi = hesapBakiyesi - cekilecekTutar                     gunlukLimit = gunlukLimit - cekilecekTutar                     YAZ "İşleminiz onaylanmıştır. Lütfen paranızı alınız."                     YAZ "Kalan Hesap Bakiyeniz: ", hesapBakiyesi, " TL"                     YAZ "Kalan Günlük Limitiniz: ", gunlukLimit, " TL"                 DEĞİLSE-SONU             DEĞİLSE-SONU         DEĞİLSE-SONU
+
+        // --- 2.4: İşlem Tekrarı Sorusu ---         YAZ "-------------------------------------------"         YAZ "Başka bir işlem yapmak ister misiniz? (Evet için 'E', Hayır için 'H' giriniz)"         OKU islemTekrari
+
+    DÖNGÜ-SONU
+
+    // --- 3. Adım: Oturumu Sonlandırma ---     YAZ "İşleminiz tamamlanmıştır. Kartınızı almayı unutmayınız."     YAZ "İyi günler dileriz."
+
+SON

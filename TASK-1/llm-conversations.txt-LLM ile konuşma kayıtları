@@ -1,0 +1,189 @@
+ATM para ¸cekme sistemi i¸cin detaylı pseudocode yazmanı istiyorum.
+ S¸unları i¸cermeli: PIN do˘grulama (3 hak), bakiye kontrol¨u, tutar
+ kontrol¨u (20 TL katları), g¨unl¨uk limit kontrol¨u, i¸slem tekrarı se¸cene˘gi. T¨um
+ adımları BAS¸LA, OKU, YAZ, E˘ GER-˙ ISE, D¨ ONG¨ U yapılarıyla yaz.
+Elbette. Bir profesörün temel bir konuyu anlatır gibi, bir ATM'nin para çekme işlemini adım adım modelleyen, istenen tüm kontrolleri içeren detaylı sözde kodu (pseudocode) aşağıda hazırladım.
+
+Sözde kod, bir programın gerçek kodunu yazmadan önce, algoritmanın mantığını ve adımlarını insan diline yakın bir şekilde ifade etme yöntemidir. Bu, programın iskeletini oluşturmamıza yardımcı olur.
+
+ATM Para Çekme Sistemi Sözde Kodu (Pseudocode)
+Öncelikle sistemimizde kullanacağımız temel değişkenleri tanımlayalım. Bunlar, işlem boyunca bilgileri geçici olarak saklayacağımız hafıza alanlarıdır.
+
+Değişkenler:
+
+dogruPIN: Banka sisteminde kayıtlı olan doğru PIN kodu (Örnek: 1234)
+
+kullaniciPIN: Kullanıcının girdiği PIN kodu
+
+denemeHakki: PIN deneme hakkı sayısı (Başlangıçta 3)
+
+hesapBakiyesi: Kullanıcının hesaptaki mevcut para miktarı (Örnek: 5000 TL)
+
+gunlukLimit: Kullanıcının o gün çekebileceği maksimum tutar (Örnek: 7500 TL)
+
+cekilecekTutar: Kullanıcının çekmek istediği para miktarı
+
+islemTekrari: Kullanıcının başka bir işlem yapıp yapmak istemediğini tutan değişken (E/H)
+Algoritma Adımları:
+
+BAŞLA
+
+    // --- 1. Adım: Kullanıcıyı Karşılama ve PIN Doğrulama ---
+
+    YAZ "Bankamıza Hoş Geldiniz. Lütfen kartınızı yerleştiriniz."
+
+    denemeHakki = 3
+
+    DÖNGÜ (denemeHakki > 0)         YAZ "Lütfen 4 haneli şifrenizi (PIN) giriniz:"         OKU kullaniciPIN
+
+        EĞER (kullaniciPIN == dogruPIN) İSE             YAZ "Giriş başarılı. İşlem menüsüne yönlendiriliyorsunuz."             DÖNGÜDEN ÇIK // PIN doğru, döngüyü sonlandır.         DEĞİLSE             denemeHakki = denemeHakki - 1             YAZ "Hatalı şifre girdiniz. Kalan deneme hakkınız: ", denemeHakki
+
+            EĞER (denemeHakki == 0) İSE                 YAZ "3 kez hatalı giriş yaptınız. Güvenlik nedeniyle kartınız bloke edilmiştir."                 YAZ "Lütfen şubenizle iletişime geçiniz."                 PROGRAMI SONLANDIR             EĞER-SONU         DEĞİLSE-SONU     DÖNGÜ-SONU
+
+    // --- 2. Adım: Ana İşlem Döngüsü ---
+
+    islemTekrari = 'E'     DÖNGÜ (islemTekrari == 'E' VEYA islemTekrari == 'e')
+
+        // --- 2.1: Tutar Bilgisini Alma ---         YAZ "-------------------------------------------"         YAZ "Hesap Bakiyeniz: ", hesapBakiyesi, " TL"         YAZ "Kalan Günlük Limitiniz: ", gunlukLimit, " TL"         YAZ "Lütfen çekmek istediğiniz tutarı giriniz (Sadece 20 TL ve katları):"         OKU cekilecekTutar
+
+        // --- 2.2: Tutar Kontrolleri ---
+
+        // Kontrol A: Tutar 20'nin katı mı?         EĞER (cekilecekTutar % 20 != 0) İSE             YAZ "HATA: Yalnızca 20 TL ve katları tutarında işlem yapabilirsiniz."         DEĞİLSE             // Kontrol B: Bakiye yeterli mi?             EĞER (cekilecekTutar > hesapBakiyesi) İSE                 YAZ "HATA: İşlem için bakiyeniz yetersizdir."             DEĞİLSE                 // Kontrol C: Günlük limit aşılıyor mu?                 EĞER (cekilecekTutar > gunlukLimit) İSE                     YAZ "HATA: Bu işlemle günlük para çekme limitinizi aşıyorsunuz."                 DEĞİLSE                     // --- 2.3: İşlemi Gerçekleştirme (Tüm kontroller başarılıysa) ---                     hesapBakiyesi = hesapBakiyesi - cekilecekTutar                     gunlukLimit = gunlukLimit - cekilecekTutar                     YAZ "İşleminiz onaylanmıştır. Lütfen paranızı alınız."                     YAZ "Kalan Hesap Bakiyeniz: ", hesapBakiyesi, " TL"                     YAZ "Kalan Günlük Limitiniz: ", gunlukLimit, " TL"                 DEĞİLSE-SONU             DEĞİLSE-SONU         DEĞİLSE-SONU
+
+        // --- 2.4: İşlem Tekrarı Sorusu ---         YAZ "-------------------------------------------"         YAZ "Başka bir işlem yapmak ister misiniz? (Evet için 'E', Hayır için 'H' giriniz)"         OKU islemTekrari
+
+    DÖNGÜ-SONU
+
+    // --- 3. Adım: Oturumu Sonlandırma ---     YAZ "İşleminiz tamamlanmıştır. Kartınızı almayı unutmayınız."     YAZ "İyi günler dileriz."
+
+SON
+bana bu kodları dot koduna çevirir misin?
+Elbette. Sunduğunuz bu detaylı sözde kodu, Graphviz tarafından kullanılan DOT diline çevirelim. Bu, algoritmanızın mantıksal akışını görsel bir şemaya (akış diyagramına) dönüştürmemizi sağlar.
+
+Bir profesör olarak konuyu en temelden alırsak; DOT dili, bir metin dosyasına basit komutlar yazarak karmaşık şemalar ve grafikler oluşturmaya yarayan bir dildir. Düğümleri (nodes) ve bu düğümleri birbirine bağlayan kenarları (edges) tanımlayarak bir yapı oluştururuz. Şimdi sizin sözde kodunuzun mantığını bu dille ifade edelim.
+
+Aşağıdaki DOT kodunu kopyalayıp Graphviz gibi bir görselleştirme aracına yapıştırırsanız, ATM sisteminizin akış şemasını elde edersiniz.
+
+ATM Para Çekme Sistemi için DOT Kodu
+digraph ATM_Flow_Chart {
+    // Grafik ayarları: Yukarıdan aşağıya akış ve varsayılan şekiller
+    rankdir=TD;
+    node [shape=box, style="rounded,filled", fillcolor=lightblue];
+    edge [fontname=Helvetica, fontsize=10];
+
+    // Düğüm tanımlamaları (Adımlar)
+    Basla [label="BAŞLA", shape=ellipse, fillcolor=lightgreen];
+    Son [label="SON (Kart İade)", shape=ellipse, fillcolor=tomato];
+    Son_Bloke [label="SON (Kart Bloke)", shape=ellipse, fillcolor=red, fontcolor=white];
+
+    // 1. Adım: PIN Doğrulama
+    Karsilama [label="YAZ: Bankamıza Hoş Geldiniz"];
+    DenemeHakkiAta [label="denemeHakki = 3"];
+    PinSor [label="YAZ: Lütfen şifrenizi giriniz"];
+    PinOku [label="OKU: kullaniciPIN", shape=parallelogram, fillcolor=khaki];
+    PinKontrol [label="kullaniciPIN == dogruPIN ?", shape=diamond, fillcolor=yellow];
+    GirisBasarili [label="YAZ: Giriş başarılı"];
+    DenemeHakkiAzalt [label="denemeHakki = denemeHakki - 1"];
+    HataliSifreUyarisi [label="YAZ: Hatalı şifre. Kalan hak: "];
+    DenemeHakkiKontrol [label="denemeHakki == 0 ?", shape=diamond, fillcolor=yellow];
+    KartBloke [label="YAZ: Kartınız bloke edilmiştir."];
+
+    // 2. Adım: Ana İşlem Döngüsü
+    BakiyeGoster [label="YAZ: Bakiye ve Günlük Limit"];
+    TutarSor [label="YAZ: Çekmek istediğiniz tutarı giriniz"];
+    TutarOku [label="OKU: cekilecekTutar", shape=parallelogram, fillcolor=khaki];
+    
+    // 2.2: Tutar Kontrolleri
+    Kontrol_20TL [label="cekilecekTutar % 20 != 0 ?", shape=diamond, fillcolor=yellow];
+    Hata_20TL [label="HATA: Yalnızca 20 TL ve katları"];
+    
+    Kontrol_Bakiye [label="cekilecekTutar > hesapBakiyesi ?", shape=diamond, fillcolor=yellow];
+    Hata_Bakiye [label="HATA: Bakiye yetersiz"];
+
+    Kontrol_Limit [label="cekilecekTutar > gunlukLimit ?", shape=diamond, fillcolor=yellow];
+    Hata_Limit [label="HATA: Günlük limit aşıldı"];
+
+    // 2.3: İşlemi Gerçekleştirme
+    IslemiYap [label="hesapBakiyesi -= cekilecekTutar\ngunlukLimit -= cekilecekTutar"];
+    IslemOnaylandi [label="YAZ: İşlem onaylandı. Parayı alınız."];
+    YeniBakiyeGoster [label="YAZ: Kalan Bakiye ve Limit"];
+
+    // 2.4: İşlem Tekrarı
+    TekrarSor [label="YAZ: Başka işlem yapmak ister misiniz? (E/H)"];
+    TekrarOku [label="OKU: islemTekrari", shape=parallelogram, fillcolor=khaki];
+    TekrarKontrol [label="islemTekrari == 'E' ?", shape=diamond, fillcolor=yellow];
+
+    // 3. Adım: Oturumu Sonlandırma
+    CikisMesaji [label="YAZ: Kartınızı almayı unutmayınız.\nİyi günler dileriz."];
+
+
+    // Kenarlar (Akış Yönleri)
+    Basla -> Karsilama;
+    Karsilama -> DenemeHakkiAta;
+    DenemeHakkiAta -> PinSor;
+
+    // PIN Döngüsü
+    PinSor -> PinOku;
+    PinOku -> PinKontrol;
+    PinKontrol -> GirisBasarili [label=" Evet (Doğru PIN)"];
+    PinKontrol -> DenemeHakkiAzalt [label=" Hayır (Yanlış PIN)"];
+    DenemeHakkiAzalt -> HataliSifreUyarisi;
+    HataliSifreUyarisi -> DenemeHakkiKontrol;
+    DenemeHakkiKontrol -> PinSor [label=" Hayır (Hak Var)"];
+    DenemeHakkiKontrol -> KartBloke [label=" Evet (Hak Bitti)"];
+    KartBloke -> Son_Bloke;
+
+    // Ana İşlem Döngüsü Başlangıcı
+    GirisBasarili -> BakiyeGoster;
+    
+    // Tutar Alma ve Kontroller
+    BakiyeGoster -> TutarSor;
+    TutarSor -> TutarOku;
+    TutarOku -> Kontrol_20TL;
+    
+    Kontrol_20TL -> Kontrol_Bakiye [label=" Hayır (Geçerli Tutar)"];
+    Kontrol_20TL -> Hata_20TL [label=" Evet (Geçersiz Tutar)"];
+    
+    Kontrol_Bakiye -> Kontrol_Limit [label=" Hayır (Bakiye Yeterli)"];
+    Kontrol_Bakiye -> Hata_Bakiye [label=" Evet (Bakiye Yetersiz)"];
+
+    Kontrol_Limit -> IslemiYap [label=" Hayır (Limit Yeterli)"];
+    Kontrol_Limit -> Hata_Limit [label=" Evet (Limit Aşıldı)"];
+
+    // Hata Durumlarından Sonra Tekrar Sorma Adımına Geçiş
+    Hata_20TL -> TekrarSor;
+    Hata_Bakiye -> TekrarSor;
+    Hata_Limit -> TekrarSor;
+
+    // Başarılı İşlem Akışı
+    IslemiYap -> IslemOnaylandi;
+    IslemOnaylandi -> YeniBakiyeGoster;
+    YeniBakiyeGoster -> TekrarSor;
+
+    // Tekrar Döngüsü
+    TekrarSor -> TekrarOku;
+    TekrarOku -> TekrarKontrol;
+    TekrarKontrol -> BakiyeGoster [label=" Evet"];
+    TekrarKontrol -> CikisMesaji [label=" Hayır"];
+
+    // Program Sonu
+    CikisMesaji -> Son;
+}
+Bu Kod Nasıl Çalışır?
+digraph ATM_Flow_Chart { ... }: Bu, yönlendirilmiş bir grafik (directed graph) oluşturacağımızı belirtir. Yani okların yönü önemlidir.
+
+rankdir=TD;: Şemanın yukarıdan aşağıya (Top to Down) doğru akmasını sağlar.
+
+node [...]: Düğümlerin (kutucukların) varsayılan görünümünü ayarlar.
+
+Basla [label="BAŞLA", shape=ellipse];: Basla adında, üzerinde "BAŞLA" yazan ve elips şeklinde bir düğüm oluşturur. Diğer tüm düğümler bu mantıkla tanımlanır.
+
+shape=box: İşlem adımları için.
+
+shape=diamond: Karar verme (EĞER/IF) adımları için.
+
+shape=parallelogram: Kullanıcıdan veri okuma (OKU) adımları için.
+
+PinKontrol -> GirisBasarili [label=" Evet (Doğru PIN)"];: PinKontrol düğümünden GirisBasarili düğümüne, üzerinde "Evet (Doğru PIN)" yazan bir ok çizer. Bu, algoritmanın akışını temsil eder.
+
+Bu DOT kodu, sizin yazdığınız sözde kodun birebir görsel karşılığıdır ve bir yazılım geliştirme sürecinde algoritmanın doğruluğunu kontrol etmek için mükemmel bir araçtır.

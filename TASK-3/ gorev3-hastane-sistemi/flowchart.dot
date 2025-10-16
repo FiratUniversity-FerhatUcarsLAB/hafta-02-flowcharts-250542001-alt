@@ -1,0 +1,48 @@
+digraph HastaneSistemi {
+    rankdir=LR
+    node [shape=box]
+
+    subgraph cluster_randevu {
+        label = "Modül 1: Randevu Alma"
+        R1 [label="TC No Doğrulama"]
+        R2 [label="Poliklinik Seçimi"]
+        R3 [label="Doktor Seçimi"]
+        R4 [label="Uygun Saat Seçimi"]
+        R5 [label="Randevu Onayı"]
+        R6 [label="Randevu Kaydet & SMS Gönder"]
+
+        R1 -> R2 -> R3 -> R4 -> R5
+        R5 -> R6 [label="Onaylandı"]
+        R5 -> R1 [label="İptal"]
+    }
+
+    subgraph cluster_tahlil {
+        label = "Modül 2: Tahlil Sonuçları"
+        T1 [label="TC No Doğrulama"]
+        T2 [label="Tahlil Var mı?"]
+        T3 [label="Sonuç Hazır mı?"]
+        T4 [label="Sonucu Göster"]
+        T5 [label="PDF İndir?"]
+
+        T1 -> T2
+        T2 -> T3 [label="Evet"]
+        T2 -> T1 [label="Hayır"]
+        T3 -> T4 [label="Evet"]
+        T3 -> T1 [label="Hayır"]
+        T4 -> T5
+        T5 -> T1
+    }
+
+    Start [label="Başla", shape=ellipse]
+    Menu [label="İşlem Seçimi\n1-Randevu\n2-Tahlil", shape=diamond]
+    Loop [label="Başka işlem yapmak ister misiniz?\n(E/H)", shape=diamond]
+    End [label="Bitir", shape=ellipse]
+
+    Start -> Menu
+    Menu -> R1 [label="1"]
+    Menu -> T1 [label="2"]
+    R6 -> Loop
+    T5 -> Loop
+    Loop -> Menu [label="E"]
+    Loop -> End [label="H"]
+}

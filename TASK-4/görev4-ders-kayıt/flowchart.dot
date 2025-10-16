@@ -1,0 +1,57 @@
+digraph DersKayitSistemi {
+    rankdir=TB;
+    node [shape=box];
+
+    Giriş [label="Giriş Yap (No + Şifre)"];
+    GirişKontrol [label="Giriş Başarılı mı?", shape=diamond];
+    DersListesi [label="Ders Listesini Göster"];
+    DersSec [label="Ders Seç"];
+    Kontenjan [label="Kontenjan Var mı?", shape=diamond];
+    OnKosul [label="Ön Koşul Sağlandı mı?", shape=diamond];
+    ZamanCakisma [label="Zaman Çakışması Var mı?", shape=diamond];
+    KrediKontrol [label="Kredi Limiti Aşıldı mı?", shape=diamond];
+    DevamSecim [label="Yeni Ders Seçilecek mi?", shape=diamond];
+    GPAKontrol [label="GPA < 2.5 mi?", shape=diamond];
+    DanismanOnay [label="Danışman Onayı Alındı mı?", shape=diamond];
+    KayitOzeti [label="Kayıt Özeti Göster"];
+    Onay [label="Öğrenci Onayı?", shape=diamond];
+    Kaydet [label="Kayıt Kaydedildi"];
+    Iptal [label="Kayıt İptal Edildi"];
+    Hata [label="Uyarı Göster"];
+    Son [label="Sistem Sonlandı"];
+
+    Giriş -> GirişKontrol;
+    GirişKontrol -> DersListesi [label="Evet"];
+    GirişKontrol -> Hata [label="Hayır"];
+    Hata -> Son;
+
+    DersListesi -> DersSec;
+    DersSec -> Kontenjan;
+    Kontenjan -> OnKosul [label="Evet"];
+    Kontenjan -> DersSec [label="Hayır"];
+
+    OnKosul -> ZamanCakisma [label="Evet"];
+    OnKosul -> DersSec [label="Hayır"];
+
+    ZamanCakisma -> KrediKontrol [label="Hayır"];
+    ZamanCakisma -> DersSec [label="Evet"];
+
+    KrediKontrol -> DevamSecim [label="Hayır"];
+    KrediKontrol -> DersSec [label="Evet"];
+
+    DevamSecim -> DersSec [label="Evet"];
+    DevamSecim -> GPAKontrol [label="Hayır"];
+
+    GPAKontrol -> DanismanOnay [label="Evet"];
+    GPAKontrol -> KayitOzeti [label="Hayır"];
+
+    DanismanOnay -> KayitOzeti [label="Evet"];
+    DanismanOnay -> Iptal [label="Hayır"];
+
+    KayitOzeti -> Onay;
+    Onay -> Kaydet [label="Evet"];
+    Onay -> Iptal [label="Hayır"];
+
+    Kaydet -> Son;
+    Iptal -> Son;
+}

@@ -1,0 +1,202 @@
+ E-ticaret sitesinde ¨ur¨un ekleme, sepet y¨onetimi ve ¨odeme s¨urecini
+ modelleyin.  Sistem Gereksinimleri:
+ Kullanıcı giri¸s kontrol¨u (ko¸sul)
+ ¨ Ur¨un kategorileri arasında gezinme (d¨ong¨u)
+ ¨ Ur¨un sepete ekleme
+ Stok kontrol¨u (ko¸sul)
+ Sepeti g¨or¨unt¨uleme ve d¨uzenleme (d¨ong¨u)
+ ˙ Indirim kodu uygulanabilir (ko¸sul)
+ Minimum 50 TL kontrol¨u (ko¸sul)
+ Kargo ¨ucreti hesaplama (ko¸sul: ¿200 TL ¨ucretsiz)
+ ¨ Odeme y¨ontemi se¸cimi (ko¸sul)
+ Sipari¸s onayı
+bana bunu presudocode şeklinde yazar mısın
+Elbette! Aşağıda, e-ticaret sitesindeki ürün ekleme, sepet yönetimi ve ödeme sürecini kapsayan sistemi pseudocode (yani sözde kod) şeklinde yazıyorum.
+
+Bu pseudocode, koşulları (IF, ELSE), döngüleri (WHILE, FOR) ve işlemleri mantıksal sırayla gösterecek şekilde yapılandırılmıştır.
+BEGIN
+
+// 1. Kullanıcı Girişi
+DISPLAY "Giriş yapınız"
+IF user.login() == TRUE THEN
+    DISPLAY "Hoş geldiniz, [kullanıcı adı]"
+ELSE
+    DISPLAY "Giriş başarısız, tekrar deneyiniz"
+    RETURN TO login
+END IF
+
+// 2. Ürün Kategorilerinde Gezinme
+DO
+    DISPLAY categoryList
+    category = user.selectCategory()
+    productList = getProducts(category)
+    DISPLAY productList
+
+    product = user.selectProduct()
+    IF product != NULL THEN
+
+        // 3. Stok Kontrolü
+        IF product.stock > 0 THEN
+            quantity = user.selectQuantity()
+            IF quantity <= product.stock THEN
+                cart.add(product, quantity)
+                DISPLAY "Ürün sepete eklendi"
+            ELSE
+                DISPLAY "Yeterli stok yok"
+            END IF
+        ELSE
+            DISPLAY "Ürün stokta yok"
+        END IF
+
+    END IF
+
+    choice = user.select("Alışverişe devam etmek istiyor musunuz? (Evet/Hayır)")
+WHILE choice == "Evet"
+
+// 4. Sepet Görüntüleme ve Düzenleme
+DO
+    DISPLAY cart.view()
+    editChoice = user.select("Sepeti düzenlemek istiyor musunuz? (Evet/Hayır)")
+    IF editChoice == "Evet" THEN
+        action = user.select("Sil / Miktar Güncelle")
+        product = user.selectProductFromCart()
+        IF action == "Sil" THEN
+            cart.remove(product)
+        ELSE IF action == "Miktar Güncelle" THEN
+            newQuantity = user.inputQuantity()
+            cart.update(product, newQuantity)
+        END IF
+    END IF
+UNTIL editChoice == "Hayır"
+
+// 5. İndirim Kodu Uygulama
+discountCode = user.enterDiscountCode()
+IF discountCode != "" THEN
+    IF isValid(discountCode) THEN
+        cart.applyDiscount(discountCode)
+        DISPLAY "İndirim kodu uygulandı"
+    ELSE
+        DISPLAY "Geçersiz indirim kodu"
+    END IF
+END IF
+
+// 6. Minimum Tutar Kontrolü
+IF cart.total < 50 THEN
+    DISPLAY "Sepet tutarı minimum 50 TL olmalı"
+    RETURN TO cart.view()
+END IF
+
+// 7. Kargo Ücreti Hesaplama
+IF cart.total >= 200 THEN
+    shippingCost = 0
+    DISPLAY "Kargo ücretsiz"
+ELSE
+    shippingCost = 29.90
+    DISPLAY "Kargo ücreti: 29.90 TL"
+END IF
+cart.total = cart.total + shippingCost
+
+// 8. Ödeme Yöntemi Seçimi
+paymentMethod = user.selectPaymentMethod()
+IF paymentMethod == NULL THEN
+    DISPLAY "Lütfen ödeme yöntemi seçiniz"
+    RETURN TO payment selection
+END IF
+
+// 9. Sipariş Onayı
+DISPLAY cart.summary()
+confirm = user.select("Siparişi onaylıyor musunuz? (Evet/Hayır)")
+IF confirm == "Evet" THEN
+    placeOrder(cart, paymentMethod)
+    DISPLAY "Siparişiniz alınmıştır. Teşekkür ederiz!"
+ELSE
+    DISPLAY "Sipariş iptal edildi"
+END IF
+
+END
+peki bu kodu bana dot koduna çevirebilir misin
+digraph ECommerce {
+    rankdir=TB;
+    node [shape=box, style=filled, color=lightgray];
+
+    start [label="Başla", shape=oval, color=green];
+
+    login [label="Kullanıcı girişi"];
+    loginCheck [label="Giriş başarılı mı?", shape=diamond];
+
+    showCategories [label="Kategorileri göster"];
+    selectProduct [label="Ürün seçildi mi?", shape=diamond];
+    stockCheck [label="Stok var mı?", shape=diamond];
+    quantityCheck [label="Miktar uygun mu?", shape=diamond];
+    addToCart [label="Ürün sepete eklendi"];
+
+    continueShopping [label="Alışverişe devam?", shape=diamond];
+
+    viewCart [label="Sepeti görüntüle"];
+    editCart [label="Sepet düzenle?", shape=diamond];
+    editAction [label="Sil / Miktar Güncelle"];
+
+    discountCheck [label="İndirim kodu var mı?", shape=diamond];
+    discountValid [label="Kod geçerli mi?", shape=diamond];
+    applyDiscount [label="İndirim uygulandı"];
+
+    minAmountCheck [label="Sepet >= 50 TL mi?", shape=diamond];
+    shippingCheck [label="Sepet >= 200 TL mi?", shape=diamond];
+    freeShipping [label="Kargo ücretsiz"];
+    paidShipping [label="Kargo: +29.90 TL"];
+
+    paymentSelect [label="Ödeme yöntemi seçildi mi?", shape=diamond];
+    orderSummary [label="Sipariş özeti ve onay"];
+    confirmOrder [label="Siparişi onaylıyor mu?", shape=diamond];
+
+    completeOrder [label="Sipariş tamamlandı", shape=oval, color=green];
+    cancelOrder [label="Sipariş iptal edildi", shape=oval, color=red];
+
+    // Edges
+    start -> login;
+    login -> loginCheck;
+    loginCheck -> showCategories [label="Evet"];
+    loginCheck -> login [label="Hayır"];
+
+    showCategories -> selectProduct;
+    selectProduct -> stockCheck [label="Evet"];
+    selectProduct -> continueShopping [label="Hayır"];
+
+    stockCheck -> quantityCheck [label="Evet"];
+    stockCheck -> showCategories [label="Hayır"];
+
+    quantityCheck -> addToCart [label="Evet"];
+    quantityCheck -> showCategories [label="Hayır"];
+
+    addToCart -> continueShopping;
+    continueShopping -> showCategories [label="Evet"];
+    continueShopping -> viewCart [label="Hayır"];
+
+    viewCart -> editCart;
+    editCart -> editAction [label="Evet"];
+    editCart -> discountCheck [label="Hayır"];
+    editAction -> discountCheck;
+
+    discountCheck -> discountValid [label="Evet"];
+    discountCheck -> minAmountCheck [label="Hayır"];
+
+    discountValid -> applyDiscount [label="Evet"];
+    discountValid -> minAmountCheck [label="Hayır"];
+    applyDiscount -> minAmountCheck;
+
+    minAmountCheck -> shippingCheck [label="Evet"];
+    minAmountCheck -> viewCart [label="Hayır"];
+
+    shippingCheck -> freeShipping [label="Evet"];
+    shippingCheck -> paidShipping [label="Hayır"];
+
+    freeShipping -> paymentSelect;
+    paidShipping -> paymentSelect;
+
+    paymentSelect -> orderSummary [label="Evet"];
+    paymentSelect -> paymentSelect [label="Hayır"];
+
+    orderSummary -> confirmOrder;
+    confirmOrder -> completeOrder [label="Evet"];
+    confirmOrder -> cancelOrder [label="Hayır"];
+}

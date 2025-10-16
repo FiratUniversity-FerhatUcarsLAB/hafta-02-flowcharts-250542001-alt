@@ -1,0 +1,159 @@
+ögrenci ders kayıt sisteminin tüm kontrollerini ve kurallarını modelleyin.
+ Sistem Gereksinimleri:
+ ¨ ögrenci girişi (öğrenci no + şifre)
+ Ders listesini görüntüleme (döngü)
+ Her ders için:
+ Kontenjan kontrolü (koşul)
+ ön koşul dersi kontrolu (koşul)
+ Zaman ¸cakı¸sması kontrolu (koşul)
+ Kredi limiti kontrolu (toplam ≤ 35) (koşul)
+ Ders ekleme/cıkarma (d¨ong¨u)
+ Danışman onayı gerekli mi? (GPA ¡ 2.5 ise) (koşul)
+ Kayıt özeti gösterme ve kayıt onaylama
+Karmaşık Sistem İçin Adım Adım Yaklaşım:
+ 1. Genel Yapı
+ “Üniversite ders kayıt sisteminin genel akışını açıkla: giriş, ders listesi, ders
+ seçimi, kontroller, onaylama.”
+ 2. Kontrol Mekanizmaları
+ “Ders kaydında yapılması gereken kontrolleri listele: kontenjan, ö koşul,
+ zaman çakışması, kredi limiti, danışman onayı.”
+ 3. Pseudocode OluŞturma
+ “Tüm bu kontrollerle birlikte detaylı pseudocode yaz. İç içe EĞER-İSE
+ yapıları ve döngüler kullan.”
+ 4. DOT Dönüşümü
+ “Bu pseudocode’u Graphviz DOT diline ¸cevir. Her kontrol noktasını
+ diamond ile göster.”
+Aşağıda, bir üniversite öğrenci ders kayıt sistemini adım adım modelleyeceğiz. 
+İstenilen dört adımda (Genel yapı, Kontroller, Pseudocode, DOT dönüşümü) ilerleyeceğiz.
+1. Genel Yapı: Ders Kayıt Sisteminin Genel Akışı
+1. Öğrenci giriş yapar (öğrenci no + şifre)
+2. Ders listesini görüntüler
+3. Ders seçimi yapılır (ders ekleme/çıkarma)
+4. Her seçilen ders için:
+   a. Kontenjan kontrolü
+   b. Ön koşul kontrolü
+   c. Zaman çakışması kontrolü
+   d. Kredi limiti kontrolü
+5. Tüm dersler seçildikten sonra:
+   a. Eğer GPA < 2.5 ise danışman onayı gerekir
+6. Kayıt özeti gösterilir
+7. Öğrenci kayıt işlemini onaylar
+2. Kontrol Mekanizmaları: Ders Kaydında Yapılan Kontroller
+Kontrol Türü	Açıklama
+Kontenjan kontrolü	Derste boş kontenjan var mı?
+Ön koşul kontrolü	Ön koşul ders(ler)i geçmiş mi?
+Zaman çakışması	Ders saatleri başka seçilen derslerle çakışıyor mu?
+Kredi limiti kontrolü	Toplam seçilen derslerin kredisi 35’ten fazla mı?
+Danışman onayı	Öğrencinin GPA’si < 2.5 ise, danışman onayı gerekiyor mu?
+3. Pseudocode: İç içe KOŞUL ve DÖNGÜ Yapıları
+Başla
+    ÖğrenciNo, Şifre ile giriş yap
+    Eğer giriş başarılıysa:
+        DersListesiniGöster()
+        SeçilenDersler = []
+        ToplamKredi = 0
+
+        Tekrar:
+            Ders = DersSeç()
+            Eğer Ders == 'Çık':
+                DÖNGÜDEN ÇIK
+            Eğer Ders zaten SeçilenDersler içinde:
+                Uyarı("Ders zaten seçildi")
+                Devam et
+
+            Eğer Ders.kontenjan == 0:
+                Uyarı("Kontenjan dolu")
+                Devam et
+
+            Eğer !ÖnKoşullarTamamlandı(Ders):
+                Uyarı("Ön koşullar sağlanmamış")
+                Devam et
+
+            Eğer ZamanÇakışıyor(Ders, SeçilenDersler):
+                Uyarı("Zaman çakışması var")
+                Devam et
+
+            Eğer ToplamKredi + Ders.kredi > 35:
+                Uyarı("Kredi limiti aşıldı")
+                Devam et
+
+            SeçilenDersler.append(Ders)
+            ToplamKredi += Ders.kredi
+
+        GPA = ÖğrenciNotOrt()
+        Eğer GPA < 2.5:
+            DanışmanOnayı = OnayAl("Danışman onayı gerekli")
+            Eğer DanışmanOnayı == False:
+                Uyarı("Danışman onayı alınamadı")
+                Bitir
+
+        KayıtÖzetiGörüntüle(SeçilenDersler)
+        Onay = KullanıcıdanOnayAl()
+        Eğer Onay:
+            Kaydet(SeçilenDersler)
+            Mesaj("Kayıt tamamlandı")
+        Aksi halde:
+            Mesaj("Kayıt iptal edildi")
+
+    Aksi halde:
+        Uyarı("Giriş başarısız")
+Bitir
+4. DOT Dönüşümü (Graphviz)
+Her kontrol noktası diamond (❖) şeklinde gösterilecek. Aşağıda basit ve temiz bir Graphviz DOT çıktısı var:
+digraph DersKayitSistemi {
+    rankdir=TB;
+    node [shape=box];
+
+    Giriş [label="Giriş Yap (No + Şifre)"];
+    GirişKontrol [label="Giriş Başarılı mı?", shape=diamond];
+    DersListesi [label="Ders Listesini Göster"];
+    DersSec [label="Ders Seç"];
+    Kontenjan [label="Kontenjan Var mı?", shape=diamond];
+    OnKosul [label="Ön Koşul Sağlandı mı?", shape=diamond];
+    ZamanCakisma [label="Zaman Çakışması Var mı?", shape=diamond];
+    KrediKontrol [label="Kredi Limiti Aşıldı mı?", shape=diamond];
+    DevamSecim [label="Yeni Ders Seçilecek mi?", shape=diamond];
+    GPAKontrol [label="GPA < 2.5 mi?", shape=diamond];
+    DanismanOnay [label="Danışman Onayı Alındı mı?", shape=diamond];
+    KayitOzeti [label="Kayıt Özeti Göster"];
+    Onay [label="Öğrenci Onayı?", shape=diamond];
+    Kaydet [label="Kayıt Kaydedildi"];
+    Iptal [label="Kayıt İptal Edildi"];
+    Hata [label="Uyarı Göster"];
+    Son [label="Sistem Sonlandı"];
+
+    Giriş -> GirişKontrol;
+    GirişKontrol -> DersListesi [label="Evet"];
+    GirişKontrol -> Hata [label="Hayır"];
+    Hata -> Son;
+
+    DersListesi -> DersSec;
+    DersSec -> Kontenjan;
+    Kontenjan -> OnKosul [label="Evet"];
+    Kontenjan -> DersSec [label="Hayır"];
+
+    OnKosul -> ZamanCakisma [label="Evet"];
+    OnKosul -> DersSec [label="Hayır"];
+
+    ZamanCakisma -> KrediKontrol [label="Hayır"];
+    ZamanCakisma -> DersSec [label="Evet"];
+
+    KrediKontrol -> DevamSecim [label="Hayır"];
+    KrediKontrol -> DersSec [label="Evet"];
+
+    DevamSecim -> DersSec [label="Evet"];
+    DevamSecim -> GPAKontrol [label="Hayır"];
+
+    GPAKontrol -> DanismanOnay [label="Evet"];
+    GPAKontrol -> KayitOzeti [label="Hayır"];
+
+    DanismanOnay -> KayitOzeti [label="Evet"];
+    DanismanOnay -> Iptal [label="Hayır"];
+
+    KayitOzeti -> Onay;
+    Onay -> Kaydet [label="Evet"];
+    Onay -> Iptal [label="Hayır"];
+
+    Kaydet -> Son;
+    Iptal -> Son;
+}

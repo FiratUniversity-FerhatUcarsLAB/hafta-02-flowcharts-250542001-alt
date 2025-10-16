@@ -1,0 +1,90 @@
+digraph ATM_Flowchart {
+    // Grafik ayarları
+    rankdir=TB;
+    node [shape=box, style="rounded,filled", fontname="Helvetica"];
+    edge [fontname="Helvetica"];
+
+    // Düğüm stilleri
+    start_end [shape=ellipse, fillcolor="#90ee90"];
+    io [shape=parallelogram, fillcolor="#add8e6"];
+    decision [shape=diamond, fillcolor="#ffd700"];
+    process_node [shape=box, fillcolor="#f0e68c"];
+    error_node [shape=box, fillcolor="#ffcccb"];
+
+    // Başlangıç ve Son Düğümleri
+    BASLA [label="BAŞLA", style="rounded,filled", fillcolor="#9f9"];
+    SON_BLOKE [label="SON (Kart Bloke Edildi)", style="rounded,filled", fillcolor="#f99"];
+    SON_NORMAL [label="SON (İşlem Bitti)", style="rounded,filled", fillcolor="#f99"];
+
+    // --- 1. Adım: PIN Doğrulama ---
+    karsilama [label="YAZ \"Bankamıza Hoş Geldiniz...\"", shape=parallelogram];
+    init_pin [label="denemeHakki = 3", shape=box];
+    ask_pin [label="YAZ \"Lütfen 4 haneli şifrenizi giriniz:\"", shape=parallelogram];
+    read_pin [label="OKU kullaniciPIN", shape=parallelogram];
+    check_pin [label="kullaniciPIN == dogruPIN?", shape=diamond];
+    pin_success [label="YAZ \"Giriş başarılı...\""];
+    pin_fail [label="denemeHakki = denemeHakki - 1\nYAZ \"Hatalı şifre...\"", shape=box];
+    check_attempts [label="denemeHakki == 0?", shape=diamond];
+    card_blocked [label="YAZ \"Kartınız bloke edilmiştir.\"\nYAZ \"Şubenizle iletişime geçiniz.\"", shape=box, fillcolor="#ff6347"];
+
+    // --- 2. Adım: Ana İşlem Döngüsü ---
+    main_loop_check [label="Başka işlem yapılacak mı?\n(islemTekrari == 'E')", shape=diamond];
+    show_info [label="YAZ Hesap Bakiyesi\nYAZ Günlük Limit", shape=parallelogram];
+    ask_amount [label="YAZ \"Çekmek istediğiniz tutarı giriniz:\"", shape=parallelogram];
+    read_amount [label="OKU cekilecekTutar", shape=parallelogram];
+
+    // --- 2.2: Tutar Kontrolleri ---
+    check_multiple_20 [label="cekilecekTutar % 20 != 0?", shape=diamond];
+    error_multiple_20 [label="HATA: Yalnızca 20 TL ve katları", shape=box, fillcolor="#ffcccb"];
+    
+    check_balance [label="cekilecekTutar > hesapBakiyesi?", shape=diamond];
+    error_balance [label="HATA: Bakiye yetersiz", shape=box, fillcolor="#ffcccb"];
+    
+    check_limit [label="cekilecekTutar > gunlukLimit?", shape=diamond];
+    error_limit [label="HATA: Günlük limit aşıldı", shape=box, fillcolor="#ffcccb"];
+
+    // --- 2.3: İşlemi Gerçekleştirme ---
+    process_transaction [label="hesapBakiyesi -= cekilecekTutar\ngunlukLimit -= cekilecekTutar\nYAZ \"İşleminiz onaylandı...\"", shape=box];
+
+    // --- 2.4 & 3. Adım: Tekrar ve Sonlandırma ---
+    ask_repeat [label="YAZ \"Başka bir işlem? (E/H)\"\nOKU islemTekrari", shape=parallelogram];
+    end_session [label="YAZ \"Kartınızı almayı unutmayınız.\"\nYAZ \"İyi günler dileriz.\"", shape=parallelogram];
+
+    // Akış Bağlantıları
+    BASLA -> karsilama -> init_pin -> ask_pin;
+    ask_pin -> read_pin -> check_pin;
+
+    // PIN Kontrol Akışı
+    check_pin -> pin_fail [label=" Hayır"];
+    pin_fail -> check_attempts;
+    check_attempts -> card_blocked [label=" Evet"];
+    card_blocked -> SON_BLOKE;
+    check_attempts -> ask_pin [label=" Hayır"];
+    
+    // Başarılı Giriş Sonrası Akış
+    check_pin -> pin_success [label=" Evet"];
+    pin_success -> main_loop_check;
+
+    // Ana İşlem Döngüsü Akışı
+    main_loop_check -> show_info [label=" Evet"];
+    show_info -> ask_amount -> read_amount -> check_multiple_20;
+
+    // Tutar Kontrol Akışları
+    check_multiple_20 -> check_balance [label=" Hayır (Geçerli)"];
+    check_balance -> check_limit [label=" Hayır (Geçerli)"];
+    check_limit -> process_transaction [label=" Hayır (Geçerli)"];
+    process_transaction -> ask_repeat;
+
+    // Hata Durumları Akışı
+    check_multiple_20 -> error_multiple_20 [label=" Evet (Hatalı)"];
+    check_balance -> error_balance [label=" Evet (Hatalı)"];
+    check_limit -> error_limit [label=" Evet (Hatalı)"];
+    error_multiple_20 -> ask_repeat;
+    error_balance -> ask_repeat;
+    error_limit -> ask_repeat;
+
+    // Döngü ve Sonlandırma Akışı
+    ask_repeat -> main_loop_check;
+    main_loop_check -> end_session [label=" Hayır"];
+    end_session -> SON_NORMAL;
+}

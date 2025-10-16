@@ -1,0 +1,28 @@
+digraph SmartHomeSecurity {
+    rankdir=LR;
+    
+    Start [shape=circle, label="Başla"];
+    CheckSystem [shape=diamond, label="Sistem Aktif mi?"];
+    SensorLoop [shape=box, label="Sensör Verilerini Oku\n(Hareket / Kapı / Kamera)"];
+    ThreatLevel [shape=box, label="Tehdit Seviyesi Belirle"];
+    ThreatCheck [shape=diamond, label="Tehdit Var mı?"];
+    AlarmTrigger [shape=box, label="Alarm Çal &\nBildirim Gönder"];
+    FalseAlarmCheck [shape=diamond, label="Yanlış Alarm mı?\n(Ev Sahibi Evde mi?)"];
+    WaitReset [shape=box, label="Alarm Sıfırlama\nBekle"];
+    LoopBack [shape=box, label="Bekle ve Tekrar Kontrol Et"];
+    End [shape=doublecircle, label="Sürekli"];
+
+    Start -> CheckSystem;
+    CheckSystem -> SensorLoop [label="Evet"];
+    SensorLoop -> ThreatLevel;
+    ThreatLevel -> ThreatCheck;
+    ThreatCheck -> AlarmTrigger [label="Evet"];
+    AlarmTrigger -> FalseAlarmCheck;
+    FalseAlarmCheck -> WaitReset;
+    WaitReset -> LoopBack;
+    ThreatCheck -> LoopBack [label="Hayır"];
+    LoopBack -> SensorLoop [label="Sürekli"];
+
+    // Sonsuz döngüyü göstermek için geri ok
+    End -> SensorLoop [style=dashed, label="Sürekli"];
+}

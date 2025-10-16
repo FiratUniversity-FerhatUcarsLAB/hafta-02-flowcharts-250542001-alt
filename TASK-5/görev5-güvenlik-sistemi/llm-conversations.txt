@@ -1,0 +1,119 @@
+IoT tabanlı akıllı ev güvenlik sisteminin alarm ve bildirim süreçlerini modelleyin.
+ Sistem Gereksinimleri:
+ Sistem aktif mi kontrolü (koşul)
+ Sensör okuma döngüsü (döngü- sürekli)
+ Hareket sensörü kontrolü (koşul)
+ Kapı/pencere sensörü kontrolü (koşul)
+ Kamera aktivasyonu (koşul)
+ Yanlış alarm kontrolü (ev sahibi evde mi?) (koşul)
+ Alarm seviyesi belirleme (1-düşük, 2-orta, 3-yüksek) (koşul)
+ Bildirim gönderme (SMS + App + Email)
+ Bekle ve tekrar kontrol et (döngü)
+ Alarm sıfırlama veya devam ettirme (koşul) 
+Sürekli çalışan Sistemler İçin:
+ Sonsuz Döngü Yaklaşımı  DOT dilinde sonsuz döngüyü göstermek için geri ok kullanın ve ”Sürekli”
+ etiketi ekleyin. 
+ “Akıllı ev güvenlik sistemi 7/24 ¸calışır. Ana döngü i¸cinde sensör okuma,
+ tehdit algılama, alarm verme ve bildirim gönderme süreçlerini içeren
+ pseudocode yaz.”
+ Ana DÖNGÜ sürekli çalışır (DOĞRU koşulu ile)
+ Her döngü iterasyonunda tüm sensörler kontrol edilir
+ Tehdit seviyesine göre farklı aksiyonlar alınır
+ Alarm sıfırlama komutu gelene kadar devam eder
+Aşağıda, IoT tabanlı akıllı ev güvenlik sisteminin alarm ve bildirim süreçlerini modelleyen bir pseudocode 
+(sözde kod) ve buna uygun bir DOT dilinde sonsuz döngü modellemesi verilmiştir.
+Pseudocode: Akıllı Ev Güvenlik Sistemi (7/24 Çalışan)
+// Akıllı Ev Güvenlik Sistemi - Pseudocode
+
+SistemAktif = TRUE
+EvSahibiEvde = FALSE
+
+FONKSİYON TehditSeviyesiniBelirle(hareket, kapiPencere, kamera):
+    SEVİYE = 0
+    EĞER hareket VEYA kapiPencere:
+        SEVİYE = 1
+        EĞER kamera:
+            SEVİYE = 2
+        EĞER NOT EvSahibiEvde:
+            SEVİYE = 3
+    DÖN SEVİYE
+
+FONKSİYON BildirimGonder(seviye):
+    GÖNDER "SMS" -> "Tehdit Seviyesi: " + seviye
+    GÖNDER "App" -> "Tehdit Seviyesi: " + seviye
+    GÖNDER "Email" -> "Tehdit Seviyesi: " + seviye
+
+// Sürekli çalışan ana döngü
+WHILE SistemAktif:  // Sürekli
+
+    // Sensör verilerini oku
+    hareket = HareketSensoruOku()
+    kapiPencere = KapiPencereSensoruOku()
+    kamera = KameraKontrolEt()
+
+    // Tehdit seviyesi belirle
+    seviye = TehditSeviyesiniBelirle(hareket, kapiPencere, kamera)
+
+    // Alarm ve Bildirim
+    EĞER seviye > 0:
+        AlarmCal()
+        BildirimGonder(seviye)
+
+        // Alarm durdurulmazsa devam et
+        ALARM_DURDURULDU = False
+        WHILE NOT ALARM_DURDURULDU:
+            ALARM_DURDURULDU = AlarmSifirlamaKontrol()
+            BEKLE(5 saniye)
+
+    // Bekle ve yeniden kontrol et
+    BEKLE(1 saniye)
+DOT Dilinde Sonsuz Döngü Modeli
+digraph SmartHomeSecurity {
+    rankdir=LR;
+    
+    Start [shape=circle, label="Başla"];
+    CheckSystem [shape=diamond, label="Sistem Aktif mi?"];
+    SensorLoop [shape=box, label="Sensör Verilerini Oku\n(Hareket / Kapı / Kamera)"];
+    ThreatLevel [shape=box, label="Tehdit Seviyesi Belirle"];
+    ThreatCheck [shape=diamond, label="Tehdit Var mı?"];
+    AlarmTrigger [shape=box, label="Alarm Çal &\nBildirim Gönder"];
+    FalseAlarmCheck [shape=diamond, label="Yanlış Alarm mı?\n(Ev Sahibi Evde mi?)"];
+    WaitReset [shape=box, label="Alarm Sıfırlama\nBekle"];
+    LoopBack [shape=box, label="Bekle ve Tekrar Kontrol Et"];
+    End [shape=doublecircle, label="Sürekli"];
+
+    Start -> CheckSystem;
+    CheckSystem -> SensorLoop [label="Evet"];
+    SensorLoop -> ThreatLevel;
+    ThreatLevel -> ThreatCheck;
+    ThreatCheck -> AlarmTrigger [label="Evet"];
+    AlarmTrigger -> FalseAlarmCheck;
+    FalseAlarmCheck -> WaitReset;
+    WaitReset -> LoopBack;
+    ThreatCheck -> LoopBack [label="Hayır"];
+    LoopBack -> SensorLoop [label="Sürekli"];
+
+    // Sonsuz döngüyü göstermek için geri ok
+    End -> SensorLoop [style=dashed, label="Sürekli"];
+}
+Özet: Sistem İşleyişi
+
+Sistem aktifleştirilir.
+
+Tüm sensörler döngüsel olarak kontrol edilir.
+
+Tehdit tespit edilirse:
+
+Alarm seviyesi belirlenir (1-3 arası).
+
+Alarm çalınır.
+
+SMS, uygulama bildirimi ve e-mail gönderilir.
+
+Ev sahibi evdeyse yanlış alarm kontrolü yapılır.
+
+Alarm sıfırlanana kadar devam eder.
+
+Her döngüde yeniden kontrol yapılır.
+
+Sistem 7/24 çalışır.

@@ -1,0 +1,131 @@
+ Hastanede randevu alma ve tahlil sonuçlarına erişim sistemini modelleyin.
+ Sistem Gereksinimleri:
+ Hasta kimlik doğrulama (TC No)
+ ˙
+ Işlem seçimi: 1-Randevu Al, 2-Tahlil Sonucu Gör (koşul)
+ Randevu mod¨ul¨u: Poliklinik se¸cimi, doktor listesi, uygun saatler
+ (döngü)
+ Randevu onayı ve SMS gönderimi
+ Tahlil modülü: Tahlil var mı kontrolü (koşul)
+ Sonuç hazır mı kontrolü (koşul)
+ Sonuç görüntüleme veya bekleme mesajı
+ Sonuçları PDF indir seçeneği
+ Başka i¸slem yapmak ister misiniz? (döngü) ˙ Iki Modülü Ayrı Ayrı çalışın:
+ Modüll 1: Randevu Alma
+ “Hastane randevu sistemi için algoritma: kimlik doğrulama, poliklinik
+ seçimi, doktor listesi görüntüleme, uygun saatleri gösterme, randevu
+ onaylama ve SMS gönderme. Pseudocode yaz.”
+ Modül 2: Tahlil Sonuçları
+ “Tahlil sonucu görüntüleme sistemi: kimlik doğrulama, tahlil varlığı
+ kontrolü, sonuç hazır mı kontrolü, görüntüleme veya bekleme mesajı, PDF
+ indirme. Pseudocode yaz.”
+ Son Adım: Birleştirme
+ Ana menü ile iki modülü birleştirin
+ DOT kodunda her modülü ayrı subgraph olarak düzenleyebilirsiniz
+Aşağıda, iki modülü ayrı ayrı modelleyen pseudocode ve ardından ana menü ile bu modülleri birleştiren bir DOT (Graphviz) diyagramı sunuyorum.
+Her modül, hastane sistemindeki işlemleri koşul ve döngülerle temsil eder şekilde yapılandırılmıştır.
+Başla
+    TC_No ← kullanıcıdan_al("TC Kimlik Numaranızı girin:")
+    eğer TC_No geçerliyse:
+        poliklinik_listesi_göster()
+        poliklinik ← kullanıcıdan_al("Poliklinik seçin:")
+        
+        doktor_listesi ← doktorlari_getir(poliklinik)
+        doktor_listesi_göster(doktor_listesi)
+        doktor ← kullanıcıdan_al("Doktor seçin:")
+        
+        uygun_saatler ← saatleri_getir(doktor)
+        uygun_saatler_göster(uygun_saatler)
+        saat ← kullanıcıdan_al("Saat seçin:")
+        
+        randevu_onay ← kullanıcıdan_al("Randevuyu onaylıyor musunuz? (E/H):")
+        eğer randevu_onay == 'E' ise:
+            randevu_kaydet(TC_No, doktor, saat)
+            SMS_gonder(TC_No, doktor, saat)
+            yazdır("Randevunuz oluşturuldu ve SMS gönderildi.")
+        değilse:
+            yazdır("Randevu iptal edildi.")
+    değilse:
+        yazdır("Geçersiz TC Kimlik Numarası.")
+Bitir
+Başla
+    TC_No ← kullanıcıdan_al("TC Kimlik Numaranızı girin:")
+    eğer TC_No geçerliyse:
+        tahlil_var_mi ← tahlil_kontrol(TC_No)
+        eğer tahlil_var_mi:
+            sonuc_hazir_mi ← sonuc_durumu(TC_No)
+            eğer sonuc_hazir_mi:
+                sonucu_goster(TC_No)
+                indir ← kullanıcıdan_al("PDF indirmek ister misiniz? (E/H):")
+                eğer indir == 'E':
+                    PDF_indir(TC_No)
+                değilse:
+                    yazdır("İndirme işlemi atlandı.")
+            değilse:
+                yazdır("Tahlil sonucu henüz hazır değil. Lütfen sonra tekrar deneyin.")
+        değilse:
+            yazdır("Sistemde kayıtlı tahlil bulunmamaktadır.")
+    değilse:
+        yazdır("Geçersiz TC Kimlik Numarası.")
+Bitir
+Başla
+    tekrar ← 'E'
+    tekrar == 'E' iken:
+        işlem ← kullanıcıdan_al("İşlem seçin: 1-Randevu Al, 2-Tahlil Sonucu Gör:")
+        
+        eğer işlem == 1:
+            Randevu Alma modülünü çalıştır
+        eğer işlem == 2:
+            Tahlil Sonuçları modülünü çalıştır
+        
+        tekrar ← kullanıcıdan_al("Başka işlem yapmak ister misiniz? (E/H):")
+    yazdır("Sistemden çıkılıyor...")
+Bitir
+digraph HastaneSistemi {
+    rankdir=LR
+    node [shape=box]
+
+    subgraph cluster_randevu {
+        label = "Modül 1: Randevu Alma"
+        R1 [label="TC No Doğrulama"]
+        R2 [label="Poliklinik Seçimi"]
+        R3 [label="Doktor Seçimi"]
+        R4 [label="Uygun Saat Seçimi"]
+        R5 [label="Randevu Onayı"]
+        R6 [label="Randevu Kaydet & SMS Gönder"]
+
+        R1 -> R2 -> R3 -> R4 -> R5
+        R5 -> R6 [label="Onaylandı"]
+        R5 -> R1 [label="İptal"]
+    }
+
+    subgraph cluster_tahlil {
+        label = "Modül 2: Tahlil Sonuçları"
+        T1 [label="TC No Doğrulama"]
+        T2 [label="Tahlil Var mı?"]
+        T3 [label="Sonuç Hazır mı?"]
+        T4 [label="Sonucu Göster"]
+        T5 [label="PDF İndir?"]
+
+        T1 -> T2
+        T2 -> T3 [label="Evet"]
+        T2 -> T1 [label="Hayır"]
+        T3 -> T4 [label="Evet"]
+        T3 -> T1 [label="Hayır"]
+        T4 -> T5
+        T5 -> T1
+    }
+
+    Start [label="Başla", shape=ellipse]
+    Menu [label="İşlem Seçimi\n1-Randevu\n2-Tahlil", shape=diamond]
+    Loop [label="Başka işlem yapmak ister misiniz?\n(E/H)", shape=diamond]
+    End [label="Bitir", shape=ellipse]
+
+    Start -> Menu
+    Menu -> R1 [label="1"]
+    Menu -> T1 [label="2"]
+    R6 -> Loop
+    T5 -> Loop
+    Loop -> Menu [label="E"]
+    Loop -> End [label="H"]
+}

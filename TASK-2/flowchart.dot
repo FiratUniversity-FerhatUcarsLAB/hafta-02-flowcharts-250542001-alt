@@ -1,0 +1,39 @@
+digraph ECommerce {
+    rankdir=TB;
+    node [shape=box, style=filled, color=lightgray];
+
+    start [label="Başla", shape=oval, color=green];
+
+    login [label="Kullanıcı girişi"];
+    loginCheck [label="Giriş başarılı mı?", shape=diamond];
+
+    showCategories [label="Kategorileri göster"];
+    selectProduct [label="Ürün seçildi mi?", shape=diamond];
+    stockCheck [label="Stok var mı?", shape=diamond];
+    quantityCheck [label="Miktar uygun mu?", shape=diamond];
+    addToCart [label="Ürün sepete eklendi"];
+
+    continueShopping [label="Alışverişe devam?", shape=diamond];
+
+    viewCart [label="Sepeti görüntüle"];
+    editCart [label="Sepet düzenle?", shape=diamond];
+    editAction [label="Sil / Miktar Güncelle"];
+
+    discountCheck [label="İndirim kodu var mı?", shape=diamond];
+    discountValid [label="Kod geçerli mi?", shape=diamond];
+    applyDiscount [label="İndirim uygulandı"];
+
+    minAmountCheck [label="Sepet >= 50 TL mi?", shape=diamond];
+    shippingCheck [label="Sepet >= 200 TL mi?", shape=diamond];
+    freeShipping [label="Kargo ücretsiz"];
+    paidShipping [label="Kargo: +29.90 TL"];
+
+    paymentSelect [label="Ödeme yöntemi seçildi mi?", shape=diamond];
+    orderSummary [label="Sipariş özeti ve onay"];
+    confirmOrder [label="Siparişi onaylıyor mu?", shape=diamond];
+
+    completeOrder [label="Sipariş tamamlandı", shape=oval, color=green];
+    cancelOrder [label="Sipariş iptal edildi", shape=oval, color=red];
+
+    // Edges
+    start -> login;
